@@ -5,13 +5,43 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ac9afa5c-5be3-4db3-8f2e-9f243f3a8130" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/businessLogic/ClientBLL.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/businessLogic/OrderBLL.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/businessLogic/ProductBLL.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/businessLogic/validators/ClientAgeValidator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/businessLogic/validators/EmailValidator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/businessLogic/validators/Validator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/connection/ConnectionFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dataAccess/AbstractDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dataAccess/ClientDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dataAccess/LogDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dataAccess/OrderDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dataAccess/ProductDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dataModel/Bill.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dataModel/Client.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dataModel/Orders.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dataModel/Product.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/presentation/Controller.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/presentation/TableGenerator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/presentation/View.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/util/DateUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/org/example/pt2025_30422_turc_ariana_assignment_3/hello-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/org/example/pt2025_30422_turc_ariana_assignment_3/hello-view.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/pt2025_30422_turc_ariana_assignment_3/HelloApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/pt2025_30422_turc_ariana_assignment_3/HelloApplication.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -23,24 +53,32 @@
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="2wzwkGZ1jtP6PkVIIKrwVP3Us9w" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.ClientDAO.executor&quot;: &quot;Run&quot;,
+    &quot;Application.HelloApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.View.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -57,8 +95,20 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1747057855102</updated>
-      <workItem from="1747057856138" duration="5000" />
+      <workItem from="1747057856138" duration="794000" />
+      <workItem from="1747153916215" duration="1449000" />
+      <workItem from="1747217976365" duration="1096000" />
+      <workItem from="1747294245438" duration="3383000" />
+      <workItem from="1747318367208" duration="4171000" />
+      <workItem from="1747408588194" duration="3198000" />
+      <workItem from="1747473149778" duration="15005000" />
+      <workItem from="1747488927685" duration="1679000" />
+      <workItem from="1747557504845" duration="18210000" />
+      <workItem from="1747636126142" duration="3490000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>
