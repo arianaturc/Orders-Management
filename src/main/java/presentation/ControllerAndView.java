@@ -1,10 +1,10 @@
 package presentation;
 
 import businessLogic.ClientBLL;
+import businessLogic.LogBLL;
 import businessLogic.OrderBLL;
-import dataAccess.OrderDAO;
-import dataAccess.ProductDAO;
 import businessLogic.ProductBLL;
+import dataModel.Bill;
 import dataModel.Client;
 import dataModel.Orders;
 import dataModel.Product;
@@ -16,22 +16,18 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.converter.DoubleStringConverter;
-import javafx.util.converter.IntegerStringConverter;
 import util.DateUtil;
+import util.TableHelper;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 
-public class Controller {
+public class ControllerAndView {
 
     private BorderPane root;
 
@@ -53,7 +49,6 @@ public class Controller {
 
     private TableView<Product> productTableView;
     private ObservableList<Product> productList;
-    private ProductDAO productDAO;
     private ProductBLL productBLL = new ProductBLL();
 
     private TextField productNameField;
@@ -75,10 +70,11 @@ public class Controller {
     private ObservableList<Orders> orderList;
     private Button addOrderButton;
     private HBox orderButtonsBox;
-    private OrderDAO orderDAO;
     private final OrderBLL orderBLL = new OrderBLL();
 
-    public Controller() {
+    private Button billButton;
+
+    public ControllerAndView() {
         clientList = FXCollections.observableArrayList(clientBLL.findAllClients());
         productList = FXCollections.observableArrayList(productBLL.findAllProducts());
         initView();
@@ -92,7 +88,9 @@ public class Controller {
 
         showClientsButton = new Button("Clients");
         showProductsButton = new Button("Products");
+        billButton = new Button("Bills");
         topButtonsBox = new HBox(10, showClientsButton, showProductsButton);
+
         topButtonsBox.setPadding(new Insets(10));
 
         showClientsButton.setOnAction(e -> showClientsPanel());
@@ -104,74 +102,18 @@ public class Controller {
         showOrdersButton = new Button("Orders");
         topButtonsBox.getChildren().add(showOrdersButton);
 
+        topButtonsBox.getChildren().add(billButton);
+        billButton.setOnAction(e -> showBill());
+
         showOrdersButton.setOnAction(e -> showOrdersPanel());
     }
 
-    // ==== CLIENTS PANEL ====
+    // ===== CLIENTS PANEL =====
     private void initClientsPanel() {
         clientTableView = new TableView<>();
         clientTableView.setEditable(true);
 
-        TableColumn<Client, Integer> idCol = new TableColumn<>("ID");
-        idCol.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleIntegerProperty(cellData.getValue().getId()).asObject()
-        );
-        idCol.setEditable(false);
-
-        TableColumn<Client, String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getName()));
-        nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        nameCol.setOnEditCommit(event -> {
-            Client client = event.getRowValue();
-            client.setName(event.getNewValue());
-            clientBLL.updateClient(client);
-        });
-
-        TableColumn<Client, String> emailCol = new TableColumn<>("Email");
-        emailCol.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getEmail()));
-        emailCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        emailCol.setOnEditCommit(event -> {
-            Client client = event.getRowValue();
-            String oldEmail = client.getEmail();
-            client.setEmail(event.getNewValue());
-
-            try {
-                clientBLL.updateClient(client);
-            } catch (IllegalArgumentException e) {
-                showAlert("Invalid email format!");
-                client.setEmail(oldEmail);
-            }
-            clientTableView.refresh();
-        });
-
-        TableColumn<Client, String> addressCol = new TableColumn<>("Address");
-        addressCol.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getAddress()));
-        addressCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        addressCol.setOnEditCommit(event -> {
-            Client client = event.getRowValue();
-            client.setAddress(event.getNewValue());
-            clientBLL.updateClient(client);
-        });
-
-        TableColumn<Client, Integer> ageCol = new TableColumn<>("Age");
-        ageCol.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleIntegerProperty(cellData.getValue().getAge()).asObject());
-        ageCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-        ageCol.setOnEditCommit(event -> {
-            Client client = event.getRowValue();
-            int oldAge = client.getAge();
-            client.setAge(event.getNewValue());
-
-            try {
-                clientBLL.updateClient(client);
-            } catch (Exception e) {
-                showAlert("The age must be a valid number.");
-                client.setAge(oldAge);
-            }
-            clientTableView.refresh();
-        });
-
-        clientTableView.getColumns().addAll(idCol, nameCol, emailCol, addressCol, ageCol);
+        TableHelper.populateTableView(clientTableView, clientList, Client.class);
 
         addClientButton = new Button("Add Client");
         Button editClientButton = new Button("Edit Selected");
@@ -179,13 +121,14 @@ public class Controller {
 
         addClientButton.setOnAction(e -> showAddClientDialog());
         editClientButton.setOnAction(e -> {
-            int selectedIndex = clientTableView.getSelectionModel().getSelectedIndex();
-            if (selectedIndex >= 0) {
-                clientTableView.edit(selectedIndex, nameCol);
+            Client selectedClient = clientTableView.getSelectionModel().getSelectedItem();
+            if (selectedClient != null) {
+                showEditClientDialog(selectedClient);
             } else {
                 showAlert("Select a row to edit.");
             }
         });
+
         deleteClientButton.setOnAction(e -> deleteSelectedClient());
 
         clientButtonsBox = new HBox(10, addClientButton, editClientButton, deleteClientButton);
@@ -211,10 +154,78 @@ public class Controller {
         clientInputForm.setVisible(false);
     }
 
+    private void showEditClientDialog(Client client) {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Edit Client");
+
+        TextField nameField = new TextField(client.getName());
+        TextField emailField = new TextField(client.getEmail());
+        TextField addressField = new TextField(client.getAddress());
+        TextField ageField = new TextField(String.valueOf(client.getAge()));
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(10));
+
+        grid.addRow(0, new Label("Name:"), nameField);
+        grid.addRow(1, new Label("Email:"), emailField);
+        grid.addRow(2, new Label("Address:"), addressField);
+        grid.addRow(3, new Label("Age:"), ageField);
+
+        Button saveButton = new Button("Save");
+        Button cancelButton = new Button("Cancel");
+
+        HBox buttons = new HBox(10, saveButton, cancelButton);
+        buttons.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox vbox = new VBox(10, grid, buttons);
+        vbox.setPadding(new Insets(10));
+
+        saveButton.setOnAction(e -> {
+            try {
+
+                String newName = nameField.getText().trim();
+                String newEmail = emailField.getText().trim();
+                String newAddress = addressField.getText().trim();
+                int newAge = Integer.parseInt(ageField.getText().trim());
+
+                if (newName.isEmpty() || newEmail.isEmpty()) {
+                    showAlert("Name and Email cannot be empty.");
+                    return;
+                }
+
+                client.setName(newName);
+                client.setEmail(newEmail);
+                client.setAddress(newAddress);
+                client.setAge(newAge);
+
+                clientBLL.updateClient(client);
+
+                clientTableView.refresh();
+                dialog.close();
+            } catch (NumberFormatException ex) {
+                showAlert("Age must be a valid number.");
+            } catch (IllegalArgumentException ex) {
+                showAlert("Invalid input: " + ex.getMessage());
+            } catch (Exception ex) {
+                showAlert("Error updating client: " + ex.getMessage());
+            }
+        });
+
+        cancelButton.setOnAction(e -> dialog.close());
+
+        Scene scene = new Scene(vbox);
+        dialog.setScene(scene);
+        dialog.showAndWait();
+    }
+
+
+
     private void loadClients() {
         clientList = FXCollections.observableArrayList(clientBLL.findAllClients());
         clientTableView.setItems(clientList);
-        TableGenerator.generateTable(clientList);
     }
 
     private void showClientsPanel() {
@@ -351,63 +362,28 @@ public class Controller {
         clientList.remove(selectedClient);
     }
 
-// ==== PRODUCTS PANEL ====
+    // ===== PRODUCTS PANEL =====
     private void initProductsPanel() {
         productTableView = new TableView<>();
         productTableView.setEditable(true);
-        productTableView.setPrefHeight(500);
-        productTableView.setPrefWidth(800);
 
-        TableColumn<Product, Integer> productIdCol = new TableColumn<>("ID");
-        productIdCol.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleIntegerProperty(cellData.getValue().getId()).asObject()
-        );
-        productIdCol.setEditable(false);
-
-        TableColumn<Product, String> productNameCol = new TableColumn<>("Name");
-        productNameCol.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getProduct_name()));
-        productNameCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        productNameCol.setOnEditCommit(event -> {
-            Product product = event.getRowValue();
-            product.setProduct_name(event.getNewValue());
-            productBLL.updateProduct(product);
-        });
-
-        TableColumn<Product, Double> productPriceCol = new TableColumn<>("Price");
-        productPriceCol.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
-        productPriceCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
-        productPriceCol.setOnEditCommit(event -> {
-            Product product = event.getRowValue();
-            product.setPrice(event.getNewValue());
-            productBLL.updateProduct(product);
-        });
-
-        TableColumn<Product, Integer> productQuantityCol = new TableColumn<>("Quantity");
-        productQuantityCol.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleIntegerProperty(cellData.getValue().getStock()).asObject());
-        productQuantityCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-        productQuantityCol.setOnEditCommit(event -> {
-            Product product = event.getRowValue();
-            product.setStock(event.getNewValue());
-            productBLL.updateProduct(product);
-        });
-
-        productTableView.getColumns().addAll(productIdCol, productNameCol, productPriceCol, productQuantityCol);
+        TableHelper.populateTableView(productTableView, productList, Product.class);
 
         addProductButton = new Button("Add Product");
         Button editProductButton = new Button("Edit Selected");
         Button deleteProductButton = new Button("Delete Selected");
 
         addProductButton.setOnAction(e -> showAddProductDialog());
+
         editProductButton.setOnAction(e -> {
-            int selectedIndex = productTableView.getSelectionModel().getSelectedIndex();
-            if (selectedIndex >= 0) {
-                productTableView.edit(selectedIndex, productNameCol);
+            Product selectedProduct = productTableView.getSelectionModel().getSelectedItem();
+            if (selectedProduct != null) {
+                showEditProductDialog(selectedProduct);
             } else {
                 showAlert("Select a row to edit.");
             }
         });
+
         deleteProductButton.setOnAction(e -> deleteSelectedProduct());
 
         productButtonsBox = new HBox(10, addProductButton, editProductButton, deleteProductButton);
@@ -431,10 +407,70 @@ public class Controller {
         productInputForm.setVisible(false);
     }
 
+    private void showEditProductDialog(Product product) {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Edit Product");
+
+        TextField nameField = new TextField(product.getProduct_name());
+        TextField priceField = new TextField(String.valueOf(product.getPrice()));
+        TextField quantityField = new TextField(String.valueOf(product.getStock()));
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(10));
+
+        grid.addRow(0, new Label("Name:"), nameField);
+        grid.addRow(1, new Label("Price:"), priceField);
+        grid.addRow(2, new Label("Quantity:"), quantityField);
+
+        Button saveButton = new Button("Save");
+        Button cancelButton = new Button("Cancel");
+
+        HBox buttons = new HBox(10, saveButton, cancelButton);
+        buttons.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox vbox = new VBox(10, grid, buttons);
+        vbox.setPadding(new Insets(10));
+
+        saveButton.setOnAction(e -> {
+            try {
+                String newName = nameField.getText().trim();
+                double newPrice = Double.parseDouble(priceField.getText().trim());
+                int newQuantity = Integer.parseInt(quantityField.getText().trim());
+
+                if (newName.isEmpty()) {
+                    showAlert("Name cannot be empty.");
+                    return;
+                }
+
+                product.setProduct_name(newName);
+                product.setPrice(newPrice);
+                product.setStock(newQuantity);
+
+                productBLL.updateProduct(product);
+
+                productTableView.refresh();
+                dialog.close();
+            } catch (NumberFormatException ex) {
+                showAlert("Price and Quantity must be valid numbers.");
+            } catch (Exception ex) {
+                showAlert("Error updating product: " + ex.getMessage());
+            }
+        });
+
+        cancelButton.setOnAction(e -> dialog.close());
+
+        Scene scene = new Scene(vbox);
+        dialog.setScene(scene);
+        dialog.showAndWait();
+    }
+
+
     private void loadProducts() {
         productList = FXCollections.observableArrayList(productBLL.findAllProducts());
         productTableView.setItems(productList);
-        TableGenerator.generateTable(productList);
     }
 
     private void showProductsPanel() {
@@ -562,10 +598,10 @@ public class Controller {
         productList.remove(selectedProduct);
     }
 
-    // ===== ORDERS =====
+    // ====== ORDERS ======
     private void initOrdersPanel() {
         orderTableView = new TableView<>();
-        orderList = FXCollections.observableArrayList(orderDAO.findAll());
+        orderList = FXCollections.observableArrayList(orderBLL.findAllOrders());
         orderTableView.setItems(orderList);
 
         TableColumn<Orders, Integer> orderIdCol = new TableColumn<>("ID");
@@ -601,7 +637,6 @@ public class Controller {
 
         addOrderButton = new Button("Add New Order");
         addOrderButton.setOnAction(e -> showAddOrderDialog());
-
         orderButtonsBox = new HBox(10, addOrderButton);
         orderButtonsBox.setPadding(new Insets(10));
     }
@@ -714,7 +749,44 @@ public class Controller {
         billStage.showAndWait();
     }
 
-    // ==== UTILS ====
+    // ====== LOG ======
+    private void showBill() {
+        LogBLL logBLL = new LogBLL();
+        List<Bill> logs = logBLL.findAllProducts();
+
+        if (logs == null || logs.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Bills");
+            alert.setHeaderText("No bills found.");
+            alert.setContentText("The log table is empty.");
+            alert.showAndWait();
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("===== Bill Summary =====\n\n");
+
+        for (Bill log : logs) {
+            sb.append("Order ID     : ").append(log.order_id()).append("\n");
+            sb.append("Client Name  : ").append(log.client_name()).append("\n");
+            sb.append("Product Name : ").append(log.product_name()).append("\n");
+            sb.append("Quantity     : ").append(log.quantity()).append("\n");
+            sb.append("Order Date   : ").append(log.order_date()).append("\n");
+            sb.append("Total Price  : $").append(String.format("%.2f", log.price())).append("\n");
+            sb.append("------------------------------\n");
+        }
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Bills");
+        alert.setHeaderText("Bills:");
+        alert.setContentText(sb.toString());
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alert.showAndWait();
+    }
+
+
+
+    // ====== UTILS ======
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Information");

@@ -1,5 +1,8 @@
 package dataModel;
 
+/**
+ * Class representing a product.
+ */
 public class Product {
     private int id;
     private String product_name;

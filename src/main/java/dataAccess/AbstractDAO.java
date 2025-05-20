@@ -16,9 +16,13 @@ import java.util.stream.IntStream;
 
 import connection.ConnectionFactory;
 
+/**
+ * Generic Data Access Object that provides common database operations such as
+ * findById, findAll, insert, and update for any type T using reflection.
+ * @param <T> The type of the data model.
+ */
 public class AbstractDAO<T> {
     protected static final Logger LOGGER = Logger.getLogger(AbstractDAO.class.getName());
-
     protected final Class<T> type;
 
     @SuppressWarnings("unchecked")
@@ -37,6 +41,10 @@ public class AbstractDAO<T> {
         return sb.toString();
     }
 
+    /**
+     * Finds all entries of type T.
+     * @return A list of all entries.
+     */
     public List<T> findAll() {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -59,6 +67,12 @@ public class AbstractDAO<T> {
         return null;
     }
 
+
+    /**
+     * Finds a single entry by ID.
+     * @param id The ID of the entry.
+     * @return The entry found, or null if not found.
+     */
     public T findById(int id) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -85,6 +99,12 @@ public class AbstractDAO<T> {
         return null;
     }
 
+
+    /**
+     * Creates a list of objects from a ResultSet using reflection.
+     * @param resultSet The result set from a query.
+     * @return List of objects of type T.
+     */
     List<T> createObjects(ResultSet resultSet) {
         List<T> list = new ArrayList<T>();
         Constructor[] ctors = type.getDeclaredConstructors();
@@ -145,6 +165,11 @@ public class AbstractDAO<T> {
         return list;
     }
 
+    /**
+     * Inserts an object into the database.
+     * @param t The object to insert.
+     * @return The inserted object.
+     */
     public T insert(T t) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -197,7 +222,11 @@ public class AbstractDAO<T> {
         return t;
     }
 
-    public T update(T t) {
+    /**
+     * Updates an existing object in the database.
+     * @param t The object to update.
+     */
+    public void update(T t) {
         Connection connection = null;
         PreparedStatement statement = null;
         StringBuilder query = new StringBuilder();
@@ -231,7 +260,6 @@ public class AbstractDAO<T> {
             ConnectionFactory.close(statement);
             ConnectionFactory.close(connection);
         }
-        return t;
     }
 
 }

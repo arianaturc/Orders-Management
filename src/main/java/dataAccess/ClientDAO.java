@@ -7,8 +7,16 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
+/**
+ * DAO class for the Client entity. Provides additional delete operation
+ * that handles cascade deletions from related tables.
+ */
 public class ClientDAO extends AbstractDAO<Client> {
 
+    /**
+     * Deletes a client and all associated orders and bills.
+     * @param id The ID of the client to delete.
+     */
     public void delete(int id) {
         try (Connection connection = ConnectionFactory.getConnection()) {
             connection.setAutoCommit(false);

@@ -9,14 +9,33 @@ import dataModel.Client;
 import dataModel.Orders;
 import dataModel.Product;
 import java.util.Date;
+import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * Business Logic Layer class for handling order operations.
+ * Validates stock and client existence before placing orders and logs the transaction.
+ */
 public class OrderBLL {
     private final OrderDAO orderDAO = new OrderDAO();
     private final ProductDAO productDAO = new ProductDAO();
     private final ClientDAO clientDAO = new ClientDAO();
     private final LogDAO logDAO = new LogDAO();
 
+    public OrderBLL(){
+
+    }
+
+    /**
+     * Places a new order for a client and product, validating stock and client data.
+     *
+     * @param client_id the ID of the client
+     * @param product_id the ID of the product
+     * @param quantity the quantity ordered
+     * @return the created order
+     * @throws NoSuchElementException if the product or client does not exist
+     * @throws RuntimeException if insufficient stock is available
+     */
     public Orders placeOrder(int client_id, int product_id, int quantity) {
         Product product = productDAO.findById(product_id);
         if(product == null) {
@@ -44,5 +63,14 @@ public class OrderBLL {
         logDAO.insert(bill);
 
         return addedOrder;
+    }
+
+    /**
+     * Retrieves all placed orders.
+     *
+     * @return a list of all orders
+     */
+    public List<Orders> findAllOrders() {
+        return orderDAO.findAll();
     }
 }

@@ -1,5 +1,8 @@
 package dataModel;
 
+/**
+ * Class representing a client.
+ */
 public class Client {
     private int id;
     private String name;
@@ -26,7 +29,6 @@ public class Client {
         this.email = email;
         this.age = age;
     }
-
 
 
     public int getId() {

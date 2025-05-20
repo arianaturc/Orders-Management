@@ -10,8 +10,16 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 
+/**
+ * DAO for the Orders entity. Provides functionality to retrieve the
+ * last inserted order.
+ */
 public class OrderDAO extends AbstractDAO<Orders> {
 
+    /**
+     * Gets the most recently inserted order.
+     * @return The last inserted order.
+     */
     public Orders getLastInserted() {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -38,6 +46,5 @@ public class OrderDAO extends AbstractDAO<Orders> {
 
         return null;
     }
-
 
 }

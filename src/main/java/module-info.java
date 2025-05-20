@@ -10,4 +10,5 @@ module org.example.pt2025_30422_turc_ariana_assignment_3 {
 
 
     exports presentation;
+    exports util;
 }

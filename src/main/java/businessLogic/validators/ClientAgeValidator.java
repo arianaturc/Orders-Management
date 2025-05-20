@@ -3,6 +3,9 @@ package businessLogic.validators;
 
 import dataModel.Client;
 
+/**
+ * Validates that a client's age.
+ */
 public class ClientAgeValidator implements Validator<Client> {
     private static final int MIN_AGE = 14;
     private static final int MAX_AGE = 100;

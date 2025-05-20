@@ -1,0 +1,9 @@
+module:org.example.pt2025_30422_turc_ariana_assignment_3
+businessLogic
+businessLogic.validators
+connection
+dataAccess
+dataModel
+org.example.pt2025_30422_turc_ariana_assignment_3
+presentation
+util
