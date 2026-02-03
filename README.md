@@ -1,6 +1,6 @@
 # 🧾 Orders Management Application (Java, OOP, JDBC, JavaFX)
 
-## 📖 Overview
+##  Overview
 This project is an **Orders Management Application** built in Java for the **Fundamental Programming Techniques** course (2025, Technical University of Cluj-Napoca).  
 It follows a **layered architecture** pattern, using relational databases to store **Clients**, **Products**, **Orders** and **Bills**, and a GUI interface for user interaction.  
 
@@ -8,7 +8,7 @@ The application ensures **data integrity**, **validation**, and **logging** whil
 
 ---
 
-## 👩‍💻 Features
+##  Features
 
 ### Client Operations
 - Add new clients
@@ -37,7 +37,7 @@ The application ensures **data integrity**, **validation**, and **logging** whil
 
 ---
 
-## 🏗️ Project Structure
+##  Project Structure
 
 ### Layers
 - **Model Layer (`dataModel`)**: Classes representing entities: `Client`, `Product`, `Orders`, `Bill`
@@ -72,7 +72,7 @@ Ensure data integrity before database operations:
 
 ---
 
-## ⚙️ Tech Stack
+##  Tech Stack
 - **Language**: Java (OOP, layered architecture)
 - **GUI**: JavaFX (`JFrame`, `JTable`)
 - **Database**: PostgreSQL (Client, Product, Orders, Log tables)
